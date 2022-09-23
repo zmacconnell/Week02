@@ -26,7 +26,7 @@ namespace MyApp
                     string playersChoice = Console.ReadLine();
                     if (board.Contains(playersChoice))
                     {
-                        changeBoard(playersChoice, board, currentPlayer);
+                        bool canPlay = changeBoard(playersChoice, board, currentPlayer);
                         writeBoard(board);
                         gameState = gameStateCheck(board, currentRound, currentPlayer, gameState);
                         if (gameState != 0)
@@ -47,9 +47,16 @@ namespace MyApp
                                 break;
                             }
                         }
+                        if (canPlay)
+                        {
+                            currentPlayer = changePlayersTurn(currentPlayer);
+                            currentRound = currentRound + 1;
+                        }
                     }
-                    currentPlayer = changePlayersTurn(currentPlayer);
-                    currentRound = currentRound + 1;
+                    else
+                    {
+                        Console.WriteLine($"{playersChoice} is not a valid option.");
+                    }
                 } 
             } while (playAgain != "n"); 
             Console.WriteLine("Thank you for playing!");       
@@ -62,19 +69,28 @@ namespace MyApp
             Console.WriteLine("-+-+-");
             Console.WriteLine($"{board[6]}|{board[7]}|{board[8]}");
         }
-        static void changeBoard(string userInput, List<string> board, string currentPlayer)
+        static bool changeBoard(string userInput, List<string> board, string currentPlayer)
         {
-            int spot = int.Parse(userInput);
-            spot = spot - 1;
-            board[spot] = currentPlayer;
+            int playerChoice = int.Parse(userInput);
+            int spot = playerChoice - 1;
+            bool canPlay = true;
+            if (board[spot] == "x" || board[spot] == "o")
+            {
+                canPlay = false;
+            }
+            else
+            {
+                board[spot] = currentPlayer;
+            }
+            return canPlay;
         }
         static string changePlayersTurn(string currentTurn)
         {
             if (currentTurn == "x")
             {
-                currentTurn = "y";
+                currentTurn = "o";
             }
-            else if (currentTurn == "y")
+            else if (currentTurn == "o")
             {
                 currentTurn ="x";
             }
