@@ -7,24 +7,52 @@ namespace MyApp
     {
         static void Main(string[] args)
         {
-            List<string> board = new List<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
             string playAgain = "y";
-            string currentPlayer = "x"; 
-            int currentRound = 1;
-            while (playAgain != "n")
-                while (true)
+            do
+            {
+                if (playAgain == "n")
                 {
+                    break;
+                }
+                List<string> board = new List<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+                string currentPlayer = "x"; 
+                int currentRound = 1;
+                writeBoard(board);
+
+                while (playAgain != "n")
+                {
+                    int gameState = 0;
                     Console.Write($"Player {currentPlayer}'s turn (1-9): ");
                     string playersChoice = Console.ReadLine();
-                    writeBoard(board);
-                    gameOver(board, currentRound, currentPlayer);
-                    currentPlayer = playersTurn(currentPlayer);
-                    
-                    break;
+                    if (board.Contains(playersChoice))
+                    {
+                        changeBoard(playersChoice, board, currentPlayer);
+                        writeBoard(board);
+                        gameState = gameStateCheck(board, currentRound, currentPlayer, gameState);
+                        if (gameState != 0)
+                        {
+                            Console.WriteLine("Game Over!");
+                            if (gameState == 1)
+                            {
+                                Console.WriteLine($"Player {currentPlayer} Wins!");
+                                Console.Write("Would you like to play again (y/n): ");
+                                playAgain = Console.ReadLine();
+                                break;
+                            }
+                            else if (gameState == -1)
+                            {
+                                Console.WriteLine("It's a draw!");
+                                Console.Write("Would you like to play again (y/n): ");
+                                playAgain = Console.ReadLine();
+                                break;
+                            }
+                        }
+                    }
+                    currentPlayer = changePlayersTurn(currentPlayer);
                     currentRound = currentRound + 1;
-                }
-            Console.Write("Would you like to play again (y/n): ");
-            playAgain = Console.ReadLine();
+                } 
+            } while (playAgain != "n"); 
+            Console.WriteLine("Thank you for playing!");       
         }
         static void writeBoard(List<string> board)
         {
@@ -34,11 +62,13 @@ namespace MyApp
             Console.WriteLine("-+-+-");
             Console.WriteLine($"{board[6]}|{board[7]}|{board[8]}");
         }
-        static void changeBoard(string userInput)
+        static void changeBoard(string userInput, List<string> board, string currentPlayer)
         {
-            break;
+            int spot = int.Parse(userInput);
+            spot = spot - 1;
+            board[spot] = currentPlayer;
         }
-        static string playersTurn(string currentTurn)
+        static string changePlayersTurn(string currentTurn)
         {
             if (currentTurn == "x")
             {
@@ -50,25 +80,25 @@ namespace MyApp
             }
             return currentTurn;
         }
-        static int gameOver(List<string> board, int currentRound, string currentPlayer)
+        static int gameStateCheck(List<string> board, int currentRound, string currentPlayer, int gameState)
         // Inputs: List of spaces, Current turn
-        // 0 = keep playing, 1 = x wins, 2 = y wins, 3 = draw
+        // 0 = keep playing, 1 = winner, -1 = draw
         {
-            if (currentPlayer == "x")
+            gameState = 0;
+            if ((board[0] == currentPlayer && board[1] == currentPlayer && board[2] == currentPlayer) ||
+            (board[3] == currentPlayer && board[4] == currentPlayer && board[5] == currentPlayer) || 
+            (board[6] == currentPlayer && board[7] == currentPlayer && board[8] == currentPlayer) ||
+            (board[0] == currentPlayer && board[5] == currentPlayer && board[8] == currentPlayer) ||
+            (board[2] == currentPlayer && board[4] == currentPlayer && board[6] == currentPlayer) ||
+            (board[0] == currentPlayer && board[3] == currentPlayer && board[6] == currentPlayer) ||
+            (board[1] == currentPlayer && board[4] == currentPlayer && board[7] == currentPlayer) ||
+            (board[2] == currentPlayer && board[5] == currentPlayer && board[8] == currentPlayer))
             {
-                int gameState = 1;
-            }
-            else if (currentPlayer == "y")
-            {
-                int gameState = 2;
+                gameState = 1;
             }
             else if (currentRound == 9)
             {
-                int gameState = 3;
-            }
-            else
-            {
-                int gameState = 0;
+                gameState = -1;
             }
             
             return gameState;
